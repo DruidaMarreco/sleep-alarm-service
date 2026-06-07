@@ -24,7 +24,10 @@ from googleapiclient.discovery import build
 
 app = FastAPI(title="Sleep Alarm Service")
 
-LISBON = ZoneInfo("Europe/Lisbon")
+# Timezone is configurable via the TIMEZONE env var (IANA name, e.g.
+# "Europe/Lisbon", "America/New_York"). Defaults to Europe/Lisbon.
+TIMEZONE = os.environ.get("TIMEZONE", "Europe/Lisbon")
+TZ = ZoneInfo(TIMEZONE)
 CALENDAR_ID = "primary"
 API_KEY = os.environ["ALARM_API_KEY"]          # simple shared secret
 TOKEN_JSON = os.environ["GOOGLE_TOKEN_JSON"]    # full token JSON as env var string
@@ -55,7 +58,7 @@ def wake_time(x_api_key: str = Header(...)):
     if x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    now = datetime.now(tz=LISBON)
+    now = datetime.now(tz=TZ)
     # Search window: now -> 18 hours from now (covers tonight -> tomorrow morning)
     time_min = now.isoformat()
     time_max = (now + timedelta(hours=18)).isoformat()
@@ -80,7 +83,7 @@ def wake_time(x_api_key: str = Header(...)):
         raise HTTPException(status_code=404, detail="No Dormir event found")
 
     end_raw = dormir["end"].get("dateTime") or dormir["end"].get("date")
-    end_dt = datetime.fromisoformat(end_raw).astimezone(LISBON)
+    end_dt = datetime.fromisoformat(end_raw).astimezone(TZ)
 
     return {
         "wake_time": end_dt.strftime("%H:%M"),     # e.g. "07:30"

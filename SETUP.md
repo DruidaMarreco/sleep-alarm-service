@@ -58,10 +58,11 @@ string — copy it. You'll paste it as the `GOOGLE_TOKEN_JSON` environment varia
    (Railway auto-detects `railway.json` / `Procfile`).
 2. Set these environment variables in Railway:
 
-   | Variable            | Value |
-   |---------------------|-------|
-   | `ALARM_API_KEY`     | any strong random string (your shared secret) |
-   | `GOOGLE_TOKEN_JSON` | the JSON string printed by `extract_token.py` |
+   | Variable            | Required | Value |
+   |---------------------|----------|-------|
+   | `ALARM_API_KEY`     | yes      | any strong random string (your shared secret) |
+   | `GOOGLE_TOKEN_JSON` | yes      | the JSON string printed by `extract_token.py` |
+   | `TIMEZONE`          | no       | IANA timezone name, e.g. `Europe/Lisbon`, `America/New_York`. Defaults to `Europe/Lisbon`. |
 
 3. Deploy. Note your public URL, e.g. `https://your-service.up.railway.app`.
 
@@ -92,6 +93,7 @@ Create a Shortcut that runs at 05:00 (via an Automation):
 pip install -r requirements.txt
 export ALARM_API_KEY=dev-secret          # PowerShell: $env:ALARM_API_KEY="dev-secret"
 export GOOGLE_TOKEN_JSON='<token json>'  # PowerShell: $env:GOOGLE_TOKEN_JSON='...'
+export TIMEZONE=Europe/Lisbon            # optional; PowerShell: $env:TIMEZONE="Europe/Lisbon"
 uvicorn main:app --reload
 ```
 
@@ -99,6 +101,6 @@ Then visit http://127.0.0.1:8000/docs for the interactive API.
 
 ## Notes & caveats
 
-- **Timezone** is hardcoded to `Europe/Lisbon` (see `LISBON` in `main.py`). Change it if needed.
+- **Timezone** is set via the `TIMEZONE` env var (any IANA name), defaulting to `Europe/Lisbon`.
 - The search window is **now → +18h**, so it picks up tonight's sleep into tomorrow morning.
 - Matching is by the substring `"dormir"` (case-insensitive) in the event summary.
