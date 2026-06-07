@@ -12,6 +12,15 @@ __pycache__/
 venv/
 env/
 
+# Tooling caches & coverage
+.pytest_cache/
+.ruff_cache/
+.ty_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
 # OS / editor
 .DS_Store
 .idea/

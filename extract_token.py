@@ -1,5 +1,4 @@
-"""
-Run this ONCE locally to generate the GOOGLE_TOKEN_JSON env var value.
+"""Run this ONCE locally to generate the GOOGLE_TOKEN_JSON env var value.
 
 Usage:
   pip install google-auth-oauthlib
@@ -10,6 +9,7 @@ and it prints the JSON string to paste into Railway as GOOGLE_TOKEN_JSON.
 """
 
 import json
+
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
