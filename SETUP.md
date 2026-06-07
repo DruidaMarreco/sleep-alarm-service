@@ -58,11 +58,18 @@ string — copy it. You'll paste it as the `GOOGLE_TOKEN_JSON` environment varia
    (Railway auto-detects `railway.json` / `Procfile`).
 2. Set these environment variables in Railway:
 
-   | Variable            | Required | Value |
-   |---------------------|----------|-------|
-   | `ALARM_API_KEY`     | yes      | any strong random string (your shared secret) |
-   | `GOOGLE_TOKEN_JSON` | yes      | the JSON string printed by `extract_token.py` |
-   | `TIMEZONE`          | no       | IANA timezone name, e.g. `Europe/Lisbon`, `America/New_York`. Defaults to `Europe/Lisbon`. |
+   | Variable              | Required | Value |
+   |-----------------------|----------|-------|
+   | `ALARM_API_KEY`       | yes      | any strong random string (your shared secret) |
+   | `GOOGLE_TOKEN_JSON`   | yes      | the JSON string printed by `extract_token.py` |
+   | `TIMEZONE`            | no       | IANA timezone name, e.g. `Europe/Lisbon`, `America/New_York`. Defaults to `Europe/Lisbon`. |
+   | `CALENDAR_ID`         | no       | which calendar to read. Defaults to `primary`. |
+   | `EVENT_KEYWORD`       | no       | case-insensitive event title to match. Defaults to `Dormir`. |
+   | `SEARCH_WINDOW_HOURS` | no       | how many hours ahead to search. Defaults to `18`. |
+
+   Invalid config (missing required vars, a bad `TIMEZONE`, malformed `GOOGLE_TOKEN_JSON`,
+   or a non-integer `SEARCH_WINDOW_HOURS`) fails fast at startup with a clear error,
+   so a misconfigured deploy won't silently serve broken responses.
 
 3. Deploy. Note your public URL, e.g. `https://your-service.up.railway.app`.
 
