@@ -71,6 +71,7 @@ include = ["main.py", "extract_token.py", "tests"]
 # --------------------------------------------------------------------------- #
 [tool.pytest.ini_options]
 minversion = "8.0"
+pythonpath = ["."]
 addopts = [
     "-ra",
     "--strict-markers",
