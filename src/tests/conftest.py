@@ -25,7 +25,7 @@ os.environ.setdefault("TIMEZONE", "Europe/Lisbon")
 import pytest
 from fastapi.testclient import TestClient
 
-import main
+from sleep_alarm_service import main
 
 API_KEY = os.environ["ALARM_API_KEY"]
 

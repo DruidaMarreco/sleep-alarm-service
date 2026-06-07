@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-import main
+from sleep_alarm_service import main
 
 
 def test_health(client):

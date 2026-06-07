@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from google.auth.exceptions import GoogleAuthError
 from googleapiclient.errors import HttpError
 
-import main
+from sleep_alarm_service import main
 from tests.conftest import API_KEY
 
 

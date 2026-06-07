@@ -2,89 +2,76 @@
 name = "sleep-alarm-service"
 version = "0.1.0"
 description = "FastAPI microservice that returns the wake time from a Google Calendar sleep event."
+readme = "README.md"
 requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.0",
+    "uvicorn[standard]==0.30.6",
+    "google-auth==2.35.0",
+    "google-auth-oauthlib==1.2.1",
+    "google-api-python-client==2.149.0",
+    "tzdata==2025.2",
+]
 
-# Runtime dependencies are pinned in requirements.txt (used by Railway/Nixpacks).
-# Dev/test/lint dependencies live in requirements-dev.txt.
+[dependency-groups]
+# Dev tooling, installed by `uv sync` by default. Pure-Python, fast.
+# Toolchain: black (format) · ruff (lint) · ty (type-check) · pytest (test).
+dev = [
+    "black>=24",
+    "ruff>=0.6",
+    "ty>=0.0.1a1",
+    "pytest>=8",
+    "pytest-cov>=5",
+    "httpx>=0.27",
+]
 
-# --------------------------------------------------------------------------- #
-# Black — code formatter
-# --------------------------------------------------------------------------- #
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sleep_alarm_service"]
+
 [tool.black]
 line-length = 100
 target-version = ["py311"]
 
-# --------------------------------------------------------------------------- #
-# Ruff — linter (maximum criteria: every rule enabled, then a small, justified
-# ignore list for rules that conflict with the formatter or are pure noise).
-# --------------------------------------------------------------------------- #
 [tool.ruff]
 line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["ALL"]
-ignore = [
-    "D203",    # one-blank-line-before-class — conflicts with D211
-    "D213",    # multi-line-summary-second-line — conflicts with D212
-    "COM812",  # trailing comma — handled by the formatter
-    "ISC001",  # implicit string concat — handled by the formatter
-    "EM101",   # string literal in exception — noisy for this codebase
-    "EM102",   # f-string in exception — noisy for this codebase
-    "TRY003",  # long messages in raise — noisy alongside EM rules
-    "B008",    # function call in default arg — FastAPI Header()/Depends() idiom
-]
+select = ["E", "F", "I", "W", "UP"]
+ignore = ["E501"]
 
-[tool.ruff.lint.per-file-ignores]
-"tests/**" = [
-    "S101",     # asserts are the point of tests
-    "S105",     # fake secrets in fixtures
-    "S106",     # fake secrets in fixtures
-    "ANN",      # tests don't need full type annotations
-    "D",        # tests don't need docstrings
-    "PLR2004",  # magic values are fine in assertions
-    "INP001",   # tests are not a package
-    "ARG001",   # pytest fixtures appear as unused args
-    "SLF001",   # tests legitimately poke private internals
-    "PLW0108",  # lambdas passed to monkeypatch.setattr are idiomatic
-]
-"extract_token.py" = [
-    "T201",    # the script prints its result by design
-    "INP001",  # standalone helper script, not a package
-    "S105",    # references token field names, not real secrets
-]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-# --------------------------------------------------------------------------- #
-# ty — type checker (Astral). Strict by default; pin the target version.
-# --------------------------------------------------------------------------- #
 [tool.ty.environment]
 python-version = "3.11"
+root = ["src"]
 
-[tool.ty.src]
-include = ["main.py", "extract_token.py", "tests"]
-
-# --------------------------------------------------------------------------- #
-# Pytest — strict config, fail on unknown markers, enforce coverage.
-# --------------------------------------------------------------------------- #
 [tool.pytest.ini_options]
 minversion = "8.0"
-pythonpath = ["."]
+testpaths = ["src/tests"]
+pythonpath = ["src"]
+# importlib mode keeps discovery independent of layout; coverage gate is scoped
+# to the service module (extract_token.py is a one-shot OAuth helper, not tested).
 addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=main",
+    "--import-mode=importlib",
+    "--ignore=src/tests/mass_testing",
+    "--cov=sleep_alarm_service.main",
     "--cov-report=term-missing",
     "--cov-fail-under=90",
 ]
-testpaths = ["tests"]
 
 [tool.coverage.run]
 branch = true
-source = ["main"]
+source = ["sleep_alarm_service.main"]
 
 [tool.coverage.report]
 show_missing = true
