@@ -1,0 +1,93 @@
+[project]
+name = "sleep-alarm-service"
+version = "0.1.0"
+description = "FastAPI microservice that returns the wake time from a Google Calendar sleep event."
+requires-python = ">=3.11"
+
+# Runtime dependencies are pinned in requirements.txt (used by Railway/Nixpacks).
+# Dev/test/lint dependencies live in requirements-dev.txt.
+
+# --------------------------------------------------------------------------- #
+# Black — code formatter
+# --------------------------------------------------------------------------- #
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+# --------------------------------------------------------------------------- #
+# Ruff — linter (maximum criteria: every rule enabled, then a small, justified
+# ignore list for rules that conflict with the formatter or are pure noise).
+# --------------------------------------------------------------------------- #
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203",    # one-blank-line-before-class — conflicts with D211
+    "D213",    # multi-line-summary-second-line — conflicts with D212
+    "COM812",  # trailing comma — handled by the formatter
+    "ISC001",  # implicit string concat — handled by the formatter
+    "EM101",   # string literal in exception — noisy for this codebase
+    "EM102",   # f-string in exception — noisy for this codebase
+    "TRY003",  # long messages in raise — noisy alongside EM rules
+    "B008",    # function call in default arg — FastAPI Header()/Depends() idiom
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "S101",     # asserts are the point of tests
+    "S105",     # fake secrets in fixtures
+    "S106",     # fake secrets in fixtures
+    "ANN",      # tests don't need full type annotations
+    "D",        # tests don't need docstrings
+    "PLR2004",  # magic values are fine in assertions
+    "INP001",   # tests are not a package
+    "ARG001",   # pytest fixtures appear as unused args
+    "SLF001",   # tests legitimately poke private internals
+    "PLW0108",  # lambdas passed to monkeypatch.setattr are idiomatic
+]
+"extract_token.py" = [
+    "T201",    # the script prints its result by design
+    "INP001",  # standalone helper script, not a package
+    "S105",    # references token field names, not real secrets
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# --------------------------------------------------------------------------- #
+# ty — type checker (Astral). Strict by default; pin the target version.
+# --------------------------------------------------------------------------- #
+[tool.ty.environment]
+python-version = "3.11"
+
+[tool.ty.src]
+include = ["main.py", "extract_token.py", "tests"]
+
+# --------------------------------------------------------------------------- #
+# Pytest — strict config, fail on unknown markers, enforce coverage.
+# --------------------------------------------------------------------------- #
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=main",
+    "--cov-report=term-missing",
+    "--cov-fail-under=90",
+]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["main"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]

@@ -1,0 +1,9 @@
+# Normalize line endings to LF in the repo (prevents CRLF churn on Windows
+# and keeps black/ruff consistent between local and CI).
+* text=auto eol=lf
+*.py text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+Procfile text eol=lf
